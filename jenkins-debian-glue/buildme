@@ -1,0 +1,1 @@
+docker build -t "ad/jenkins-debian-glue:latest" .
