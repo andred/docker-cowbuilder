@@ -56,6 +56,10 @@ RUN set -x && \
     echo "DEBOOTSTRAPOPTS=( '--keyring' '/usr/share/keyrings/raspbian-archive-keyring.gpg' )" >> /etc/pbuilderrc.raspbian && \
     ln -s pbuilderrc.raspbian /etc/pbuilderrc.jessie.raspbian && \
     \
+    echo 'user ALL=NOPASSWD: /usr/sbin/cowbuilder, /usr/sbin/chroot' > /etc/sudoers.d/user && \
+    echo 'Defaults env_keep+="DEB_* DIST ARCH ADT"' >> /etc/sudoers.d/user && \
+    chmod 0440 /etc/sudoers.d/user && \
+    \
     rm -rf /var/lib/apt/lists/*
 
 #    apt-get install -y jenkins-debian-glue jenkins-debian-glue-buildenv
