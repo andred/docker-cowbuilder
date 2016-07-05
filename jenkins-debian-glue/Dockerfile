@@ -9,5 +9,6 @@ ADD base-trusty-i386.cow.tar.xz /var/cache/pbuilder/
 
 ADD base-jessie-amd64.cow.tar.xz /var/cache/pbuilder/
 ADD base-jessie-i386.cow.tar.xz /var/cache/pbuilder/
+ADD base-jessie-armhf.cow.tar.xz /var/cache/pbuilder/
 
 #USER user

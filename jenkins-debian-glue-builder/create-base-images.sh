@@ -50,6 +50,21 @@ docker run \
                     --hookdir /usr/share/jenkins-debian-glue/pbuilder-hookdir/
                 tar -C /var/cache/pbuilder --use-compress-program pxz -cf base-${dist}-${arch}.cow.tar.xz base-${dist}-${arch}.cow
             done
+        done
+
+        for dist in jessie ; do
+            for arch in armhf ; do
+                DIST=${dist} ARCH=${arch} cowbuilder --create \
+                    --basepath /var/cache/pbuilder/base-${dist}-${arch}.cow \
+                    --distribution ${dist} \
+                    --debootstrap qemu-debootstrap \
+                        --architecture ${arch} --debootstrapopts --arch \
+                                               --debootstrapopts ${arch} \
+                                               --debootstrapopts --variant=buildd \
+                    --configfile=/etc/pbuilderrc.${dist}.raspbian \
+                    --hookdir /usr/share/jenkins-debian-glue/pbuilder-hookdir/
+                tar -C /var/cache/pbuilder --use-compress-program pxz -cf base-${dist}-${arch}.cow.tar.xz base-${dist}-${arch}.cow
+            done
         done'
 
 for dist in xenial trusty jessie ; do
@@ -57,3 +72,4 @@ for dist in xenial trusty jessie ; do
         docker cp ${name}:/base-${dist}-${arch}.cow.tar.xz ../jenkins-debian-glue/
     done
 done
+docker cp ${name}:/base-jessie-armhf.cow.tar.xz ../jenkins-debian-glue/

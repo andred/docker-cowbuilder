@@ -29,10 +29,19 @@ RUN set -x && \
       && \
     apt-get install -y cowbuilder \
                        curl ca-certificates \
-                       pristine-tar quilt && \
+                       pristine-tar quilt \
+                       qemu-user-static && \
     apt-get install -y pxz && \
     \
     wget -P /usr/share/keyrings http://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg && \
+    wd=$(mktemp -d --tmpdir) && \
+    cd ${wd} && \
+    curl -O -fSL https://archive.raspbian.org/raspbian/pool/main/r/raspbian-archive-keyring/raspbian-archive-keyring_20120528.2_all.deb && \
+    dpkg -x raspbian-archive-keyring_20120528.2_all.deb . && \
+    mv usr/share/keyrings/raspbian-archive-keyring.gpg /usr/share/keyrings/ && \
+    cd - && \
+    rm -rf ${wd} && \
+    \
     echo 'MIRRORSITE=http://httpredir.debian.org/debian' > /etc/pbuilderrc.debian && \
     ln -s pbuilderrc.debian /etc/pbuilderrc.sid && \
     ln -s pbuilderrc.debian /etc/pbuilderrc.jessie && \
@@ -42,6 +51,10 @@ RUN set -x && \
     echo 'COMPONENTS="main universe"' >> /etc/pbuilderrc.ubuntu && \
     ln -s pbuilderrc.ubuntu /etc/pbuilderrc.xenial && \
     ln -s pbuilderrc.ubuntu /etc/pbuilderrc.trusty && \
+    \
+    echo 'MIRRORSITE=http://archive.raspbian.org/raspbian' > /etc/pbuilderrc.raspbian && \
+    echo "DEBOOTSTRAPOPTS=( '--keyring' '/usr/share/keyrings/raspbian-archive-keyring.gpg' )" >> /etc/pbuilderrc.raspbian && \
+    ln -s pbuilderrc.raspbian /etc/pbuilderrc.jessie.raspbian && \
     \
     rm -rf /var/lib/apt/lists/*
 
