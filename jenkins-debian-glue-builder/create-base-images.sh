@@ -37,7 +37,7 @@ docker run \
     /bin/sh -c '
         set -xe
         cd /
-        for dist in xenial trusty jessie ; do
+        for dist in xenial trusty sid jessie ; do
             for arch in amd64 i386 ; do
                 DIST=${dist} ARCH=${arch} cowbuilder --create \
                     --basepath /var/cache/pbuilder/base-${dist}-${arch}.cow \
@@ -67,7 +67,7 @@ docker run \
             done
         done'
 
-for dist in xenial trusty jessie ; do
+for dist in xenial trusty sid jessie ; do
     for arch in amd64 i386 ; do
         docker cp ${name}:/base-${dist}-${arch}.cow.tar.xz ../jenkins-debian-glue/
     done
