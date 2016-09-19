@@ -1,0 +1,58 @@
+# debian/raspbian/ubuntu specific configuration
+# they're all sorted by time, first the Ubuntu
+# releases, then the Debian/Raspbian releases
+case "${DIST}" in
+  lucid)
+    # lacks eatmydata package, so explicitely configure it
+    MIRRORSITE="http://archive.ubuntu.com/ubuntu/"
+    # we need key id 40976EAF437D05B5
+    DEBOOTSTRAPOPTS="${DEBOOTSTRAPOPTS:+${DEBOOTSTRAPOPTS} }--keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg"
+    # cowdancer is in universe
+    COMPONENTS="main universe"
+    ;;
+  precise|trusty|xenial)
+    MIRRORSITE="http://archive.ubuntu.com/ubuntu/"
+    # we need key id 40976EAF437D05B5
+    DEBOOTSTRAPOPTS="${DEBOOTSTRAPOPTS:+${DEBOOTSTRAPOPTS} }--keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg"
+    # cowdancer is in universe
+    COMPONENTS="main universe"
+    # package install speedup
+    EXTRAPACKAGES="eatmydata"
+    export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}/usr/lib/libeatmydata/libeatmydata.so"
+    ;;
+
+  lenny|squeeze)
+    # lacks eatmydata package, so explicitely configure it
+    # nowadays also resides on archive
+    MIRRORSITE="http://archive.debian.org/debian"
+    ;;
+  wheezy)
+    MIRRORSITE="http://httpredir.debian.org/debian"
+    # package install speedup
+    EXTRAPACKAGES="eatmydata"
+    export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}/usr/lib/libeatmydata/libeatmydata.so"
+    ;;
+  jessie)
+    if [ "${ARCH}" = "armhf"] ; then
+      MIRRORSITE="http://archive.raspbian.org/raspbian"
+      DEBOOTSTRAPOPTS="${DEBOOTSTRAPOPTS:+${DEBOOTSTRAPOPTS} }--keyring=/usr/share/keyrings/raspbian-archive-keyring.gpg"
+    else
+      MIRRORSITE="http://httpredir.debian.org/debian"
+    fi
+    # package install speedup
+    EXTRAPACKAGES="eatmydata"
+    # eatmydata (>=82-2)
+    LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}libeatmydata.so"
+    ;;
+  stretch|sid)
+    MIRRORSITE="http://httpredir.debian.org/debian"
+    # package install speedup
+    EXTRAPACKAGES="eatmydata"
+    # eatmydata (>=82-2)
+    LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}libeatmydata.so"
+    ;;
+
+  *)
+    false
+    ;;
+esac

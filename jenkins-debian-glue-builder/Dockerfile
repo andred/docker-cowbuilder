@@ -15,11 +15,13 @@ RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* 
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.utf8
 
-# add jenkins-debian-glue
 # We need a pbuilder workaround for Ubuntu problem, as cowdancer is available
 # only in universe :(
 #   https://bugs.launchpad.net/ubuntu/+source/cowdancer/+bug/237591
 #   https://bugs.launchpad.net/ubuntu/+source/cowdancer/+bug/747053
+COPY pbuilderrc /etc/pbuilderrc
+
+# add needed packages
 RUN set -x && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -41,20 +43,6 @@ RUN set -x && \
     mv usr/share/keyrings/raspbian-archive-keyring.gpg /usr/share/keyrings/ && \
     cd - && \
     rm -rf ${wd} && \
-    \
-    echo 'MIRRORSITE=http://httpredir.debian.org/debian' > /etc/pbuilderrc.debian && \
-    ln -s pbuilderrc.debian /etc/pbuilderrc.sid && \
-    ln -s pbuilderrc.debian /etc/pbuilderrc.jessie && \
-    ln -s pbuilderrc.debian /etc/pbuilderrc.wheezy && \
-    \
-    echo 'MIRRORSITE=http://archive.ubuntu.com/ubuntu' > /etc/pbuilderrc.ubuntu && \
-    echo 'COMPONENTS="main universe"' >> /etc/pbuilderrc.ubuntu && \
-    ln -s pbuilderrc.ubuntu /etc/pbuilderrc.xenial && \
-    ln -s pbuilderrc.ubuntu /etc/pbuilderrc.trusty && \
-    \
-    echo 'MIRRORSITE=http://archive.raspbian.org/raspbian' > /etc/pbuilderrc.raspbian && \
-    echo "DEBOOTSTRAPOPTS=( '--keyring' '/usr/share/keyrings/raspbian-archive-keyring.gpg' )" >> /etc/pbuilderrc.raspbian && \
-    ln -s pbuilderrc.raspbian /etc/pbuilderrc.jessie.raspbian && \
     \
     echo 'user ALL=NOPASSWD: /usr/sbin/cowbuilder, /usr/sbin/chroot' > /etc/sudoers.d/user && \
     echo 'Defaults env_keep+="DEB_* DIST ARCH ADT"' >> /etc/sudoers.d/user && \

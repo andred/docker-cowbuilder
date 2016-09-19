@@ -37,39 +37,39 @@ docker run \
     /bin/sh -c '
         set -xe
         cd /
-        for dist in xenial trusty sid jessie ; do
-            for arch in amd64 i386 ; do
-                DIST=${dist} ARCH=${arch} cowbuilder --create \
-                    --basepath /var/cache/pbuilder/base-${dist}-${arch}.cow \
-                    --distribution ${dist} \
-                    --debootstrap debootstrap \
-                        --architecture ${arch} --debootstrapopts --arch \
-                                               --debootstrapopts ${arch} \
-                                               --debootstrapopts --variant=buildd \
-                    --configfile=/etc/pbuilderrc.${dist} \
-                    --hookdir /usr/share/jenkins-debian-glue/pbuilder-hookdir/
-                tar -C /var/cache/pbuilder --use-compress-program pxz -cf base-${dist}-${arch}.cow.tar.xz base-${dist}-${arch}.cow
-            done
-        done
 
-        for dist in jessie ; do
-            for arch in armhf ; do
-                DIST=${dist} ARCH=${arch} cowbuilder --create \
-                    --basepath /var/cache/pbuilder/base-${dist}-${arch}.cow \
-                    --distribution ${dist} \
-                    --debootstrap qemu-debootstrap \
-                        --architecture ${arch} --debootstrapopts --arch \
-                                               --debootstrapopts ${arch} \
-                                               --debootstrapopts --variant=buildd \
-                    --configfile=/etc/pbuilderrc.${dist}.raspbian \
-                    --hookdir /usr/share/jenkins-debian-glue/pbuilder-hookdir/
-                tar -C /var/cache/pbuilder --use-compress-program pxz -cf base-${dist}-${arch}.cow.tar.xz base-${dist}-${arch}.cow
+        HOST_ARCH="$(dpkg-architecture -qDEB_HOST_ARCH)"
+
+        for distribution in xenial trusty sid jessie ; do
+            for architecture in amd64 armhf i386 ; do
+                if [ "${architecture}" = "armhf" ] && [ "${distribution}" != "jessie" ] ; then
+                    # armhf only for jessie (raspbian)
+                    continue
+                fi
+                debootstrap=qemu-debootstrap
+                if [ "${architecture}" = "${HOST_ARCH}" ] || [ "${architecture}" = "all" ] ; then
+                    debootstrap=debootstrap
+                elif [ "${HOST_ARCH}" = "amd64" ] && [ "${architecture}" = "i386" ] ; then
+                    debootstrap=debootstrap
+                fi
+                DIST=${distribution} ARCH=${architecture} cowbuilder --create \
+                    --basepath /var/cache/pbuilder/base-${distribution}-${architecture}.cow \
+                    --distribution ${distribution} --architecture ${architecture} \
+                    --debootstrap ${debootstrap} \
+                        --debootstrapopts --arch \
+                        --debootstrapopts ${architecture} \
+                        --debootstrapopts --variant=buildd \
+                    --hookdir /usr/share/jenkins-debian-glue/pbuilder-hookdir
+                tar -C /var/cache/pbuilder --use-compress-program pxz -cf base-${distribution}-${architecture}.cow.tar.xz base-${distribution}-${architecture}.cow
             done
         done'
 
-for dist in xenial trusty sid jessie ; do
-    for arch in amd64 i386 ; do
-        docker cp ${name}:/base-${dist}-${arch}.cow.tar.xz ../jenkins-debian-glue/
+for distribution in xenial trusty sid jessie ; do
+    for architecture in amd64 armhf i386 ; do
+        if [ "${architecture}" = "armhf" ] && [ "${distribution}" != "jessie" ] ; then
+            # armhf only for jessie (raspbian)
+            continue
+        fi
+        docker cp ${name}:/base-${distribution}-${architecture}.cow.tar.xz ../jenkins-debian-glue/
     done
 done
-docker cp ${name}:/base-jessie-armhf.cow.tar.xz ../jenkins-debian-glue/
