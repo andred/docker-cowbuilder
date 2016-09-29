@@ -10,15 +10,23 @@ case "${DIST}" in
     # cowdancer is in universe
     COMPONENTS="main universe"
     ;;
-  precise|trusty|xenial)
+  precise|trusty)
     MIRRORSITE="http://archive.ubuntu.com/ubuntu/"
     # we need key id 40976EAF437D05B5
     DEBOOTSTRAPOPTS="${DEBOOTSTRAPOPTS:+${DEBOOTSTRAPOPTS} }--keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg"
     # cowdancer is in universe
     COMPONENTS="main universe"
     # package install speedup
-    EXTRAPACKAGES="eatmydata"
+    EXTRAPACKAGES="$EXTRAPACKAGES eatmydata"
     export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}/usr/lib/libeatmydata/libeatmydata.so"
+    ;;
+  xenial)
+    MIRRORSITE="http://archive.ubuntu.com/ubuntu/"
+    # we need key id 40976EAF437D05B5
+    DEBOOTSTRAPOPTS="${DEBOOTSTRAPOPTS:+${DEBOOTSTRAPOPTS} }--keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg"
+    # cowdancer is in universe
+    COMPONENTS="main universe"
+    # eatmydata is handled by jdg
     ;;
 
   lenny|squeeze)
@@ -29,7 +37,7 @@ case "${DIST}" in
   wheezy)
     MIRRORSITE="http://httpredir.debian.org/debian"
     # package install speedup
-    EXTRAPACKAGES="eatmydata"
+    EXTRAPACKAGES="$EXTRAPACKAGES eatmydata"
     export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}/usr/lib/libeatmydata/libeatmydata.so"
     ;;
   jessie)
@@ -39,17 +47,11 @@ case "${DIST}" in
     else
       MIRRORSITE="http://httpredir.debian.org/debian"
     fi
-    # package install speedup
-    EXTRAPACKAGES="eatmydata"
-    # eatmydata (>=82-2)
-    LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}libeatmydata.so"
+    # eatmydata is handled by jdg
     ;;
   stretch|sid)
     MIRRORSITE="http://httpredir.debian.org/debian"
-    # package install speedup
-    EXTRAPACKAGES="eatmydata"
-    # eatmydata (>=82-2)
-    LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}libeatmydata.so"
+    # eatmydata is handled by jdg
     ;;
 
   *)
