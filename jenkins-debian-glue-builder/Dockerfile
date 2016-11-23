@@ -50,10 +50,6 @@ RUN set -x && \
     \
     rm -rf /var/lib/apt/lists/*
 
-COPY jdg.patch /root
-RUN set -x && \
-    cd /usr/bin && patch -p2 < /root/jdg.patch
-
 #    apt-get install -y jenkins-debian-glue jenkins-debian-glue-buildenv
 #    echo 'MIRRORSITE=http://archive.ubuntu.com/ubuntu' > /etc/pbuilderrc.ubuntu.trusty && \
 #    echo 'COMPONENTS="main universe"' >> /etc/pbuilderrc.ubuntu.trusty && \
