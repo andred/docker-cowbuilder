@@ -9,6 +9,8 @@ ADD base-trusty-i386.cow.tar.xz /var/cache/pbuilder/
 
 ADD base-sid-amd64.cow.tar.xz /var/cache/pbuilder/
 ADD base-sid-i386.cow.tar.xz /var/cache/pbuilder/
+ADD base-stretch-amd64.cow.tar.xz /var/cache/pbuilder/
+ADD base-stretch-i386.cow.tar.xz /var/cache/pbuilder/
 ADD base-jessie-amd64.cow.tar.xz /var/cache/pbuilder/
 ADD base-jessie-i386.cow.tar.xz /var/cache/pbuilder/
 ADD base-jessie-armhf.cow.tar.xz /var/cache/pbuilder/

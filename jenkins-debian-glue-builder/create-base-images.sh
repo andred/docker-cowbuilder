@@ -40,7 +40,7 @@ docker run \
 
         HOST_ARCH="$(dpkg-architecture -qDEB_HOST_ARCH)"
 
-        for distribution in xenial trusty sid jessie ; do
+        for distribution in xenial trusty sid stretch jessie ; do
             for architecture in amd64 armhf i386 ; do
                 if [ "${architecture}" = "armhf" ] && [ "${distribution}" != "jessie" ] ; then
                     # armhf only for jessie (raspbian)
@@ -64,7 +64,7 @@ docker run \
             done
         done'
 
-for distribution in xenial trusty sid jessie ; do
+for distribution in xenial trusty sid stretch jessie ; do
     for architecture in amd64 armhf i386 ; do
         if [ "${architecture}" = "armhf" ] && [ "${distribution}" != "jessie" ] ; then
             # armhf only for jessie (raspbian)
