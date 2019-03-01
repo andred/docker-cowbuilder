@@ -33,7 +33,7 @@ RUN set -x && \
                        curl ca-certificates \
                        pristine-tar quilt \
                        qemu-user-static && \
-    apt-get install -y pxz && \
+    apt-get install -y xz-utils && \
     \
     wget -P /usr/share/keyrings http://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg && \
     wd=$(mktemp -d --tmpdir) && \

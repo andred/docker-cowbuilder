@@ -60,7 +60,7 @@ docker run \
                         --debootstrapopts ${architecture} \
                         --debootstrapopts --variant=buildd \
                     --hookdir /usr/share/jenkins-debian-glue/pbuilder-hookdir
-                tar -C /var/cache/pbuilder --use-compress-program pxz -cf base-${distribution}-${architecture}.cow.tar.xz base-${distribution}-${architecture}.cow
+                tar -C /var/cache/pbuilder --use-compress-program "xz -T0" -cf base-${distribution}-${architecture}.cow.tar.xz base-${distribution}-${architecture}.cow
             done
         done'
 
