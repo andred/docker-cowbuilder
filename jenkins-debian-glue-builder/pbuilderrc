@@ -35,7 +35,7 @@ case "${DIST}" in
     MIRRORSITE="http://archive.debian.org/debian"
     ;;
   wheezy)
-    MIRRORSITE="http://httpredir.debian.org/debian"
+    MIRRORSITE="http://archive.debian.org/debian"
     # package install speedup
     EXTRAPACKAGES="$EXTRAPACKAGES eatmydata"
     export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}/usr/lib/libeatmydata/libeatmydata.so"
@@ -45,16 +45,17 @@ case "${DIST}" in
       MIRRORSITE="http://archive.raspbian.org/raspbian"
       DEBOOTSTRAPOPTS=(${DEBOOTSTRAPOPTS[@]:-} '--keyring=/usr/share/keyrings/raspbian-archive-keyring.gpg' )
     else
-      MIRRORSITE="http://httpredir.debian.org/debian"
+      MIRRORSITE="http://archive.debian.org/debian"
     fi
     # eatmydata is handled by jdg
     ;;
-  stretch|sid)
-    MIRRORSITE="http://httpredir.debian.org/debian"
+  stretch|buster|sid)
+    MIRRORSITE="http://deb.debian.org/debian"
     # eatmydata is handled by jdg
     ;;
 
   *)
+    echo "Please specify DIST" >&2
     false
     ;;
 esac
