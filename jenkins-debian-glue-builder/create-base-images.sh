@@ -40,12 +40,8 @@ docker run \
 
         HOST_ARCH="$(dpkg-architecture -qDEB_HOST_ARCH)"
 
-        for distribution in xenial trusty sid stretch jessie ; do
-            for architecture in amd64 armhf i386 ; do
-                if [ "${architecture}" = "armhf" ] && [ "${distribution}" != "jessie" ] ; then
-                    # armhf only for jessie (raspbian)
-                    continue
-                fi
+        for distribution in sid ; do
+            for architecture in amd64 armel ; do
                 debootstrap=qemu-debootstrap
                 if [ "${architecture}" = "${HOST_ARCH}" ] || [ "${architecture}" = "all" ] ; then
                     debootstrap=debootstrap
@@ -64,12 +60,8 @@ docker run \
             done
         done'
 
-for distribution in xenial trusty sid stretch jessie ; do
-    for architecture in amd64 armhf i386 ; do
-        if [ "${architecture}" = "armhf" ] && [ "${distribution}" != "jessie" ] ; then
-            # armhf only for jessie (raspbian)
-            continue
-        fi
+for distribution in sid ; do
+    for architecture in amd64 armel ; do
         docker cp ${name}:/base-${distribution}-${architecture}.cow.tar.xz ../jenkins-debian-glue/
     done
 done
