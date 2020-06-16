@@ -1,0 +1,22 @@
+# Directories for the Freight library and Freight cache.
+# Your web server's document root should point to $VARCACHE.
+VARLIB="/var/www/apt-repositories/@@PROJECT@@-cache"
+VARCACHE="/var/www/apt-repositories/@@PROJECT@@"
+
+# Default 'Origin' and 'Label' fields for 'Release' files.
+ORIGIN="Origin"
+LABEL="@@PROJECT_LABEL@@"
+
+# Cache the control files after each run (on), or regenerate them every
+# time (off).
+CACHE="off"
+
+# GPG key to sign repositories, derived from jenkins-debian-glue's $KEY_ID setting
+#GPG="28F6A478"
+GPG="xxxgpg@keyid"
+
+ARCHS="i386 amd64 armhf"
+
+# Whether to follow symbolic links in $VARLIB to produce extra components
+# in the cache directory (on) or not (off).
+SYMLINKS="off"

@@ -1,0 +1,108 @@
+<job>-source:
+------snip------
+clone to source/
+------
+export DEBEMAIL="maintainer name <hello.you@somewhere.fo>"
+
+export DCH_OPTS="--ignore-branch --debian-tag v%(version)s"
+if ! echo $JOB_NAME | grep -q nightly ; then
+    export USE_ORIG_VERSION="true"
+    # prevent addition of extra changelog entry
+    export SKIP_DCH="true"
+else
+    export TIMESTAMP_FORMAT="%Y%m%d"
+    export DCH_OPTS="${DCH_OPTS} -S"
+fi
+
+generate-git-snapshot
+------
+*.gz,*.bz2,*.xz,*.deb,*.dsc,*.changes,*.buildinfo,lintian.txt
+------snap------
+
+
+
+<job>-binaries:
+------snip------
+export ADT=skip
+
+export BUILD_ONLY=true
+export POST_BUILD_HOOK=$(which jdg-debc)
+
+if [ "${distribution}" = "jessie" ] ; then
+    # raspbian doesn't use a separate security repo
+    if [ "${architecture}" != "armhf" ] ; then
+        REPO_SECURITY="deb http://security.debian.org/ ${distribution}/updates main"
+    fi
+elif [ "${distribution}" = "sid" ] ; then
+    # sid doesn't use a separate security repo
+    :
+elif [ "${distribution}" = "trusty" ] || [ "${distribution}" = "xenial" ] ; then
+    if [ "${distribution}" = "trusty" ] ; then
+        forcetrusted="[trusted=yes] "
+    fi
+    REPO_SECURITY="deb ${forcetrusted}http://archive.ubuntu.com/ubuntu ${distribution}-security main"
+fi
+
+if [ "${distribution}" = "trusty" ] ; then
+    REPO_CMAKE="deb [trusted=yes] http://ppa.launchpad.net/george-edison55/cmake-3.x/ubuntu ${distribution} main"
+    PPA_KEYS="${PPA_KEYS:+${PPA_KEYS} }0xB118CD3C377DF930EDD06C67084ECFC5828AB726"
+fi
+
+# for mosquitto
+if [ "${distribution}" = "trusty" ] ; then
+    REPO_MOSQUITTO="deb [trusted=yes] http://ppa.launchpad.net/mosquitto-dev/mosquitto-ppa/ubuntu ${distribution} main"
+    PPA_KEYS="${PPA_KEYS:+${PPA_KEYS} }0x77B7346A59027B33C10CAFE35E64E954262C4500"
+fi
+
+
+
+for r in "${REPO_SECURITY}" "${REPO_CMAKE}" "${REPO_MOSQUITTO}" ; do
+  [ -z "${r}" ] && continue
+  REPOSITORY_EXTRA="${REPOSITORY_EXTRA:+${REPOSITORY_EXTRA},}${r}"
+done
+
+for k in ${PPA_KEYS} ; do
+  REPOSITORY_EXTRA_KEYS="${REPOSITORY_EXTRA_KEYS:+${REPOSITORY_EXTRA_KEYS},}http://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=${k}"
+done
+
+if echo ${REPOSITORY_EXTRA} | grep -q 'https://' ; then
+    pbuilderrc=$(pwd)/pbuilderrc
+    cp /etc/pbuilderrc $pbuilderrc
+    echo 'EXTRAPACKAGES="$EXTRAPACKAGES apt-transport-https ca-certificates"' >> $pbuilderrc
+    export PBUILDER_CONFIG=$pbuilderrc
+fi
+
+REPOSITORY_EXTRA="${REPOSITORY_EXTRA}" REPOSITORY_EXTRA_KEYS="${REPOSITORY_EXTRA_KEYS}" build-and-provide-package
+------
+*.gz,*.bz2,*.xz,*.deb,*.dsc,*.changes,*.buildinfo,lintian.txt
+------snap------
+
+
+
+<job>-repos:
+------snip------
+export BASE_PATH="binaries/"
+export PROVIDE_ONLY=true
+# set DEBOOTSTRAP to prevent the script from trying to guess
+# it using dpkg-architecture -qDEB_HOST_ARCH which doesn't exist
+# on the slave
+export DEBOOTSTRAP=false
+export REPOS="${distribution}"
+export SKIP_REMOVAL=true
+
+export USE_FREIGHT=true
+export KEY_ID=xxxgpg@keyid
+export FREIGHT_BASE=/var/www/apt-repositories
+repo="$(echo ${JOB_NAME%-repos*} | sed -e 's,\.x$,,g')"
+export FREIGHT_REPOSITORY="${repo}"
+
+curl ${JENKINS_URL}/userContent/freight.conf.template \
+    | sed -e "s,@@PROJECT@@,${repo},g" \
+          -e "s,@@PROJECT_LABEL@@,project-label,g" \
+    > ${FREIGHT_BASE}/${repo}.conf.new
+mv ${FREIGHT_BASE}/${repo}.conf.new ${FREIGHT_BASE}/${repo}.conf
+
+build-and-provide-package
+------
+**/*.dsc,**/*.changes
+------snap------
